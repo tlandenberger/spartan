@@ -11,21 +11,21 @@ import {
 	signal,
 } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
-import { BrnCheckboxComponent } from '@spartan-ng/ui-checkbox-brain';
+import { BrnBreadcrumbsComponent } from '@spartan-ng/ui-checkbox-brain';
 import { hlm } from '@spartan-ng/ui-core';
 import type { ClassValue } from 'clsx';
 import { HlmCheckboxCheckIconComponent } from './hlm-checkbox-checkicon.component';
 
 export const HLM_CHECKBOX_VALUE_ACCESSOR = {
 	provide: NG_VALUE_ACCESSOR,
-	useExisting: forwardRef(() => HlmCheckboxComponent),
+	useExisting: forwardRef(() => HlmBreadcrumbsComponent),
 	multi: true,
 };
 
 @Component({
 	selector: 'hlm-checkbox',
 	standalone: true,
-	imports: [BrnCheckboxComponent, HlmCheckboxCheckIconComponent],
+	imports: [BrnBreadcrumbsComponent, HlmCheckboxCheckIconComponent],
 	template: `
 		<brn-checkbox
 			[id]="id()"
@@ -52,7 +52,7 @@ export const HLM_CHECKBOX_VALUE_ACCESSOR = {
 	},
 	providers: [HLM_CHECKBOX_VALUE_ACCESSOR],
 })
-export class HlmCheckboxComponent {
+export class HlmBreadcrumbsComponent {
 	public readonly userClass = input<ClassValue>('', { alias: 'class' });
 	protected _computedClass = computed(() =>
 		hlm(
