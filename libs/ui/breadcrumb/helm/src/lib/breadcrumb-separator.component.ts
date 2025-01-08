@@ -1,7 +1,7 @@
 import { Component, computed, input } from '@angular/core';
 import { NgIcon, provideIcons } from '@ng-icons/core';
 import { lucideChevronRight } from '@ng-icons/lucide';
-import { hlm } from '@spartan-ng/ui-core';
+import { hlm } from '@spartan-ng/brain/core';
 import { HlmIconDirective } from '@spartan-ng/ui-icon-helm';
 import type { ClassValue } from 'clsx';
 
@@ -26,6 +26,6 @@ export class HlmBreadcrumbSeparatorComponent {
 	public readonly userClass = input<ClassValue>('', { alias: 'class' });
 
 	protected readonly _computedClass = computed(() =>
-		hlm('[&>ng-icon]:w-3.5 [&>ng-icon]:h-3.5 [&>ng-icon]:flex', this.userClass()),
+		hlm('[&>hlm-icon]:w-3.5 [&>hlm-icon]:h-3.5 [&>hlm-icon]:flex', this.userClass()),
 	);
 }
