@@ -1,8 +1,7 @@
 name: nightly-release
 
 on:
-  schedule:
-    - cron: '0 0 * * *'
+  workflow_run:
 
 jobs:
   check_date:
@@ -19,6 +18,17 @@ jobs:
         continue-on-error: true
         name: check latest commit is less than a day
         if: ${{ github.event_name == 'schedule' }}
+        # This command checks if there were any commits in the last 24 hours.
+        # If there were NO recent commits, it sets should_run=false.
+        # How it works:
+        # 1. git rev-list gets a list of all commits in last 24h
+        #    (--after="24 hours" means "show commits from 24h ago until now",
+        #     so if it runs at 2pm, it checks commits after 2pm yesterday)
+        # 2. test -z checks if that list is empty (meaning no recent commits)
+        # 3. If empty (no commits), it sets GitHub Actions output variable 'should_run' to false
+        #    This output variable can then be used in other workflow steps like:
+        #    if: ${{ steps.your-step-id.outputs.should_run != 'false' }}
+        #    to skip steps when there were no recent commits
         run: test -z $(git rev-list  --after="24 hours"  ${{ github.sha }}) && echo "::set-output name=should_run::false"
 
   commitlint:
