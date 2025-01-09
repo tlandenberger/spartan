@@ -10,12 +10,16 @@ export default async function runExecutor(_options: NpmPublishExecutorSchema, co
 	const tag = process.env.TAG;
 
 	if (!tag) {
+		console.log('no process.env.TAG available. returning early');
 		return {
 			success: false,
 		};
 	}
 
 	const sourceRoot = `./dist/${getRoot(context)}`;
+
+	console.log('running npm publish at ' + sourceRoot);
+
 	execSync(`cd ${sourceRoot} && npm publish${tag ? ` --tag ${tag}` : ''}`);
 	return {
 		success: true,
