@@ -119,6 +119,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version-file: .node-version
+          registry-url: 'https://registry.npmjs.org'
       - name: Install PNPM globally
         run: npm install -g pnpm
       - name: Install Dependencies
@@ -138,3 +139,4 @@ jobs:
         run: pnpm run release
         env:
           TAG: ${{ secrets.TAG }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
