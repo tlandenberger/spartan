@@ -1,7 +1,8 @@
 name: nightly-release
 
 on:
-  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * *'
 
 jobs:
   check_date:
@@ -29,7 +30,7 @@ jobs:
         #    This output variable can then be used in other workflow steps like:
         #    if: ${{ steps.your-step-id.outputs.should_run != 'false' }}
         #    to skip steps when there were no recent commits
-        run: test -z $(git rev-list  --after="24 hours"  ${{ github.sha }}) && echo "::set-output name=should_run::false"
+        run: test -z $(git rev-list  --after="23 hours 55 minutes"  ${{ github.sha }}) && echo "::set-output name=should_run::false"
 
   commitlint:
     needs: check_date
