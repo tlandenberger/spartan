@@ -136,3 +136,5 @@ jobs:
           message: 'chore: nightly release ${{steps.datetime.outputs.release_date}} ⚡'
       - name: Release
         run: pnpm run release
+        env:
+          TAG: ${{ secrets.TAG }}
