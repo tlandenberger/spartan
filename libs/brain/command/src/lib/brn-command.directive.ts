@@ -11,8 +11,10 @@ import {
 	inject,
 	Injector,
 	input,
+	output,
 	PLATFORM_ID,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { BrnCommandItemToken } from './brn-command-item.token';
 import { BrnCommandSearchInputDirective } from './brn-command-search-input.directive';
 import { provideBrnCommand } from './brn-command.token';
@@ -41,6 +43,9 @@ export class BrnCommandDirective implements AfterViewInit {
 
 	/** A custom filter function to use when searching. */
 	public readonly filter = input<CommandFilter>(this._defaultFilter);
+
+	/** when the selection has changed */
+	public readonly valueChange = output<string>();
 
 	/** @internal The search query */
 	public readonly search = computed(() => this._searchInput()?.value() ?? '');
@@ -76,6 +81,13 @@ export class BrnCommandDirective implements AfterViewInit {
 			},
 			{ allowSignalWrites: true },
 		);
+
+		this.keyManager.change.pipe(takeUntilDestroyed()).subscribe(() => {
+			const value = this.keyManager.activeItem?.value();
+			if (value) {
+				this.valueChange.emit(value);
+			}
+		});
 	}
 
 	ngAfterViewInit(): void {
