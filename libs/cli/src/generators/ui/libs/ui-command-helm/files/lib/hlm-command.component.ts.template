@@ -8,7 +8,12 @@ import { hlm } from '@spartan-ng/brain/core';
 	template: `
 		<ng-content />
 	`,
-	hostDirectives: [BrnCommandDirective],
+	hostDirectives: [
+		{
+			directive: BrnCommandDirective,
+			outputs: ['valueChange'],
+		},
+	],
 	host: {
 		'[class]': '_computedClass()',
 	},
