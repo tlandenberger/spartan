@@ -13,6 +13,7 @@ import {
 	input,
 	output,
 	PLATFORM_ID,
+	untracked,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { BrnCommandItemToken } from './brn-command-item.token';
@@ -48,7 +49,7 @@ export class BrnCommandDirective implements AfterViewInit {
 	public readonly valueChange = output<string>();
 
 	/** @internal The search query */
-	public readonly search = computed(() => this._searchInput()?.value() ?? '');
+	public readonly search = computed(() => this._searchInput()?.valueState() ?? '');
 
 	/** Access the search input if present */
 	private readonly _searchInput = contentChild(BrnCommandSearchInputDirective, {
@@ -68,22 +69,21 @@ export class BrnCommandDirective implements AfterViewInit {
 			.withVerticalOrientation()
 			.withHomeAndEnd()
 			.withWrap()
-			.withTypeAhead()
 			.skipPredicate((item) => item.disabled || !item.visible());
 
 		// When clearing the search input we also want to reset the active item to the first one
-		effect(
-			() => {
-				const searchInput = this._searchInput()?.value();
-				if (searchInput !== undefined && searchInput.length === 0) {
-					this.keyManager.setActiveItem(0);
+		effect(() => {
+			const searchInput = this.search();
+			untracked(() => {
+				const activeItemIsVisible = this.keyManager.activeItem?.visible();
+				if ((searchInput !== undefined && searchInput.length === 0) || !activeItemIsVisible) {
+					this.keyManager.setFirstItemActive();
 				}
-			},
-			{ allowSignalWrites: true },
-		);
+			});
+		});
 
 		this.keyManager.change.pipe(takeUntilDestroyed()).subscribe(() => {
-			const value = this.keyManager.activeItem?.value();
+			const value = this.keyManager.activeItem?.safeValue();
 			if (value) {
 				this.valueChange.emit(value);
 			}
