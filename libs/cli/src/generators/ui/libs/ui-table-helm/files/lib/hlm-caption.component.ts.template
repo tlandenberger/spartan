@@ -44,14 +44,12 @@ export class HlmCaptionComponent {
 	);
 
 	constructor() {
-		effect(
-			() => {
-				const id = this.id();
-				untracked(() => {
-					if (!this._table) return;
-					this._table.labeledBy.set(id);
-				});
-			},
-		);
+		effect(() => {
+			const id = this.id();
+			untracked(() => {
+				if (!this._table) return;
+				this._table.labeledBy.set(id);
+			});
+		});
 	}
 }
