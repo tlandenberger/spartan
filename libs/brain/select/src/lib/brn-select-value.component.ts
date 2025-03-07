@@ -58,7 +58,9 @@ export class BrnSelectValueComponent<T> {
 		}
 
 		// remove any selected values that are not in the options list
-		const existingOptions = value.filter((val) => this._select.options().some((option) => this._select.compareWith()(option.value(), val)));
+		const existingOptions = value.filter((val) =>
+			this._select.options().some((option) => this._select.compareWith()(option.value(), val)),
+		);
 		const selectedOption = existingOptions.map((val) =>
 			this._select.options().find((option) => this._select.compareWith()(option.value(), val)),
 		);
@@ -68,7 +70,7 @@ export class BrnSelectValueComponent<T> {
 		}
 
 		const selectedLabels = selectedOption.map((option) => option?.getLabel());
-		
+
 		if (this._select.dir() === 'rtl') {
 			selectedLabels.reverse();
 		}
