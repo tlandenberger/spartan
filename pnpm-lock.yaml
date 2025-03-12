@@ -86,6 +86,9 @@ importers:
       embla-carousel-angular:
         specifier: 18.0.0
         version: 18.0.0(@angular/common@18.2.5(@angular/core@18.2.5(rxjs@7.8.1)(zone.js@0.14.10))(rxjs@7.8.1))(@angular/core@18.2.5(rxjs@7.8.1)(zone.js@0.14.10))
+      embla-carousel-autoplay:
+        specifier: ^8.5.2
+        version: 8.5.2(embla-carousel@8.4.0)
       enquirer:
         specifier: 2.4.1
         version: 2.4.1
