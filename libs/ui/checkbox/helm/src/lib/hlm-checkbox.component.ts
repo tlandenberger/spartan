@@ -32,7 +32,7 @@ export const HLM_CHECKBOX_VALUE_ACCESSOR = {
 			(changed)="_handleChange()"
 			(touched)="_onTouched?.()"
 		>
-			<ng-icon [class]="_computedIconClass()" hlm size="sm" name="lucideCheck" />
+			<ng-icon [class]="_computedIconClass()" hlm size="sm" [name]="checkIconName()" />
 		</brn-checkbox>
 	`,
 	host: {
@@ -47,6 +47,7 @@ export const HLM_CHECKBOX_VALUE_ACCESSOR = {
 })
 export class HlmCheckboxComponent {
 	public readonly userClass = input<ClassValue>('', { alias: 'class' });
+	public readonly checkIconName = input<string>('lucideCheck');
 
 	protected readonly _computedClass = computed(() =>
 		hlm(

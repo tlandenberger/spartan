@@ -1,9 +1,10 @@
-import { NgIcon } from '@ng-icons/core';
+import { NgIcon, provideIcons } from '@ng-icons/core';
 import type { Meta, StoryObj } from '@storybook/angular';
 import { moduleMetadata } from '@storybook/angular';
 
 import { Component, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { lucideMoon } from '@ng-icons/lucide';
 import { HlmButtonModule } from '../button/helm/src';
 import { HlmIconDirective } from '../icon/helm/src';
 import { HlmLabelDirective } from '../label/helm/src';
@@ -40,6 +41,7 @@ const meta: Meta<HlmCheckboxComponent> = {
 		moduleMetadata({
 			declarations: [HlmCheckboxComponentTester],
 			imports: [HlmCheckboxImports, HlmLabelDirective, NgIcon, HlmIconDirective, ReactiveFormsModule, HlmButtonModule],
+			providers: [provideIcons({ lucideMoon })],
 		}),
 	],
 };
@@ -121,6 +123,17 @@ export const indeterminate: Story = {
 					aria-labelledby="testCheckbox"
 				/>
 			</div>
+		`,
+	}),
+};
+
+export const OwnIcon: Story = {
+	render: () => ({
+		template: /* HTML */ `
+			<label id="checkbox-label" class="flex items-center" hlmLabel>
+				Test Checkbox
+				<hlm-checkbox class="ml-2" id="testCheckbox" checkIconName="lucideMoon" />
+			</label>
 		`,
 	}),
 };
