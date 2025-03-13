@@ -88,6 +88,7 @@
 			"@spartan-ng/ui-input-helm": ["libs/ui/input/helm/src/index.ts"],
 			"@spartan-ng/ui-label-helm": ["libs/ui/label/helm/src/index.ts"],
 			"@spartan-ng/ui-menu-helm": ["libs/ui/menu/helm/src/index.ts"],
+			"@spartan-ng/ui-otp-helm": ["libs/ui/input-otp/helm/src/index.ts"],
 			"@spartan-ng/ui-pagination-helm": ["libs/ui/pagination/helm/src/index.ts"],
 			"@spartan-ng/ui-popover-helm": ["libs/ui/popover/helm/src/index.ts"],
 			"@spartan-ng/ui-progress-helm": ["libs/ui/progress/helm/src/index.ts"],
