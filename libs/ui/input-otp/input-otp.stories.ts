@@ -1,21 +1,25 @@
-import { Component } from '@angular/core';
-import { type Meta, type StoryObj, moduleMetadata } from '@storybook/angular';
+import { type Meta, type StoryObj, argsToTemplate, moduleMetadata } from '@storybook/angular';
 import { HlmInputOtpImports, HlmOtpGroupComponent } from './helm/src';
 
-@Component({
-	selector: 'hlm-otp-group-component-tester',
-	template: `
-		<hlm-otp-group [length]="4"></hlm-otp-group>
-	`,
-})
-class HlmOtpGroupComponentTester {}
 const meta: Meta<HlmOtpGroupComponent> = {
 	title: 'Input OTP',
 	component: HlmOtpGroupComponent,
 	tags: ['autodocs'],
+	args: {
+		length: 4,
+		pattern: '^[a-zA-Z0-9]$',
+	},
+	argTypes: {
+		length: {
+			control: { type: 'number' },
+		},
+		pattern: {
+			control: { type: 'text' },
+			description: 'A regular expression pattern (as a string) for input validation.',
+		},
+	},
 	decorators: [
 		moduleMetadata({
-			declarations: [HlmOtpGroupComponentTester],
 			imports: [HlmInputOtpImports],
 		}),
 	],
@@ -25,9 +29,19 @@ export default meta;
 type Story = StoryObj<HlmOtpGroupComponent>;
 
 export const Default: Story = {
-	render: () => ({
+	render: ({ ...args }) => ({
+		props: args,
 		template: /* HTML */ `
-			<hlm-otp-group [length]="4"></hlm-otp-group>
+			<hlm-otp-group ${argsToTemplate(args)}></hlm-otp-group>
+		`,
+	}),
+};
+
+export const Pattern: Story = {
+	render: ({ ...args }) => ({
+		props: { ...args, pattern: '\\d+' },
+		template: /* HTML */ `
+			<hlm-otp-group ${argsToTemplate(args)}></hlm-otp-group>
 		`,
 	}),
 };

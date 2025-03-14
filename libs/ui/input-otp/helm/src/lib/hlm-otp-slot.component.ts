@@ -12,12 +12,10 @@ import { HlmOtpSlotDirective } from './hlm-otp-slot-input.directive';
 		<input
 			hlmOtpSlot
 			type="text"
-			maxlength="1"
 			size="sm"
 			[value]="value()"
 			[class]="_computedClass()"
 			[disabled]="!active()"
-			[readonly]="last() && isFilled()"
 			(input)="onInput($event)"
 			(keydown)="onKeydown($event)"
 			[cdkTrapFocusAutoCapture]="active()"
@@ -27,14 +25,17 @@ import { HlmOtpSlotDirective } from './hlm-otp-slot-input.directive';
 })
 export class HlmOtpSlotComponent {
 	public readonly userClass = input<ClassValue>('', { alias: 'class' });
-	public readonly value = input<string>();
+	public readonly value = input<string>('');
 	public readonly active = input<boolean>(false);
 	public readonly first = input<boolean>(false);
 	public readonly last = input<boolean>(false);
+	public readonly pattern = input.required<RegExp>();
 
 	public readonly valueChange = output<string>();
 	public readonly focusNext = output<void>();
 	public readonly focusPrevious = output<void>();
+	public readonly moveRight = output<void>();
+	public readonly moveLeft = output<void>();
 
 	protected readonly _computedClass = computed(() =>
 		hlm('relative flex h-9 w-9 items-center justify-center transition-all', this.userClass(), {
@@ -42,29 +43,55 @@ export class HlmOtpSlotComponent {
 			'rounded-r-md border-r': this.last(),
 			'z-10 ring-2 ring-ring ring-offset-0': this.active(),
 			'cursor-not-allowed': !this.active(),
+			'caret-transparent': this._filled(),
 		}),
 	);
-	protected readonly isFilled = computed(() => this.value() !== '');
 
-	onInput(event: Event) {
+	private readonly _filled = computed(() => this.value() !== '');
+
+	protected onInput(event: Event) {
+		event.preventDefault();
 		if (!this.active()) return;
 
-		const input = event.target as HTMLInputElement;
-		const newChar = input.value;
+		const input = (event.target as HTMLInputElement).value;
+		const newChar = input.charAt(input.length - 1);
 
-		if (newChar.length === 1) {
-			this.valueChange.emit(newChar);
-			this.focusNext.emit();
+		this.updateChar(newChar);
+	}
+
+	protected onKeydown(event: KeyboardEvent) {
+		switch (event.key) {
+			case 'Backspace':
+				this.valueChange.emit('');
+				if (this.last() && this._filled()) break;
+
+				this.focusPrevious.emit();
+				break;
+			case 'ArrowLeft':
+				this.moveLeft.emit();
+				event.preventDefault();
+				break;
+			case 'ArrowRight':
+				this.moveRight.emit();
+				event.preventDefault();
+				break;
 		}
 	}
 
-	onKeydown(event: KeyboardEvent) {
-		if (event.key === 'Backspace') {
-			this.valueChange.emit('');
-			this.focusPrevious.emit();
-		} else if (this.last() && this.isFilled()) {
-			event.preventDefault();
-			this.valueChange.emit(event.key);
-		}
+	private updateChar(char: string): void {
+		this.valueChange.emit(' ');
+		const valid = this.isValidChar(char);
+		const newChar = valid ? char : this.value();
+
+		requestAnimationFrame(() => {
+			this.valueChange.emit(newChar);
+			if (valid) {
+				this.focusNext.emit();
+			}
+		});
+	}
+
+	private isValidChar(char: string): boolean {
+		return this.pattern().test(char);
 	}
 }

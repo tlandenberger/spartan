@@ -1,4 +1,4 @@
-import { Component, computed, effect, input, model, signal } from '@angular/core';
+import { Component, computed, input, model, signal } from '@angular/core';
 import { hlm } from '@spartan-ng/brain/core';
 import type { ClassValue } from 'clsx';
 import { HlmOtpSlotComponent } from './hlm-otp-slot.component';
@@ -18,9 +18,12 @@ import { HlmOtpSlotComponent } from './hlm-otp-slot.component';
 					[active]="_focused() && _activeSlotIndex() === $index"
 					[first]="first"
 					[last]="last"
+					[pattern]="_regExp()"
 					(valueChange)="updateSlot($event)"
 					(focusNext)="focusNext($index)"
 					(focusPrevious)="focusPrevious($index)"
+					(moveLeft)="moveLeft($index)"
+					(moveRight)="moveRight($index)"
 				/>
 			}
 		</div>
@@ -33,30 +36,31 @@ export class HlmOtpGroupComponent {
 
 	public readonly length = input<number>(6);
 	public readonly otp = model<string[]>([]);
+	public readonly pattern = input<RegExp | string>(RegExp(/^[a-zA-Z0-9]$/));
 
 	protected readonly _slots = computed<string[]>(() =>
 		Array.from({ length: this.length() }).map((_, index) => this.otp()[index] ?? ''),
 	);
+	protected readonly _regExp = computed<RegExp>(() => {
+		const pattern = this.pattern();
+		console.log(pattern, typeof pattern);
+		if (typeof pattern === 'string') return RegExp(pattern);
+		return pattern;
+	});
 
 	protected readonly _activeSlotIndex = signal<number>(0);
 	protected readonly _focused = signal<boolean>(true);
 	protected readonly _isFocusChanging = signal<boolean>(false);
 
-	constructor() {
-		effect(() => {
-			console.log(this.otp());
-		});
-	}
-
-	updateSlot($event: string) {
+	protected updateSlot(value: string) {
 		this.otp.update((acc) => [
 			...acc.slice(0, this._activeSlotIndex()),
-			$event,
+			value,
 			...acc.slice(this._activeSlotIndex() + 1),
 		]);
 	}
 
-	focusNext(index: number) {
+	protected focusNext(index: number) {
 		this._isFocusChanging.set(true);
 		if (index < this._slots().length - 1) {
 			this._activeSlotIndex.set(index + 1);
@@ -65,19 +69,31 @@ export class HlmOtpGroupComponent {
 		setTimeout(() => this._isFocusChanging.set(false), 10);
 	}
 
-	focusPrevious(index: number) {
-		this._isFocusChanging.set(true);
+	protected focusPrevious(index: number, removePreviousValue = true) {
 		if (index === 0) return;
+
+		this._isFocusChanging.set(true);
 		this._activeSlotIndex.set(index - 1);
+		if (removePreviousValue) this.updateSlot('');
+
 		setTimeout(() => this._isFocusChanging.set(false), 10);
 	}
 
-	onFocusOut() {
+	protected onFocusOut() {
 		if (this._isFocusChanging()) return;
 		this._focused.set(false);
 	}
 
-	onFocusIn() {
+	protected onFocusIn() {
 		this._focused.set(true);
+	}
+
+	protected moveLeft(index: number) {
+		this.focusPrevious(index, false);
+	}
+
+	protected moveRight(index: number) {
+		if (this._slots()[index] === '') return;
+		this.focusNext(index);
 	}
 }
