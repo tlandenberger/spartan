@@ -29,6 +29,7 @@ export class HlmOtpSlotComponent {
 	public readonly active = input<boolean>(false);
 	public readonly first = input<boolean>(false);
 	public readonly last = input<boolean>(false);
+	public readonly lastInOtp = input<boolean>(false);
 	public readonly pattern = input.required<RegExp>();
 
 	public readonly valueChange = output<string>();
@@ -63,7 +64,7 @@ export class HlmOtpSlotComponent {
 		switch (event.key) {
 			case 'Backspace':
 				this.valueChange.emit('');
-				if (this.last() && this._filled()) break;
+				if (this.lastInOtp() && this._filled()) break;
 
 				this.focusPrevious.emit();
 				break;
@@ -79,8 +80,11 @@ export class HlmOtpSlotComponent {
 	}
 
 	private updateChar(char: string): void {
-		this.valueChange.emit(' ');
 		const valid = this.isValidChar(char);
+		if (char === this.value() || !valid) {
+			this.valueChange.emit(' ');
+		}
+
 		const newChar = valid ? char : this.value();
 
 		requestAnimationFrame(() => {

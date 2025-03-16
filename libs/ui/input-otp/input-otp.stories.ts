@@ -1,18 +1,15 @@
 import { type Meta, type StoryObj, argsToTemplate, moduleMetadata } from '@storybook/angular';
 import { HlmInputOtpImports, HlmOtpGroupComponent } from './helm/src';
+import { HlmOtpComponent } from './helm/src/lib/hlm-otp.component';
 
-const meta: Meta<HlmOtpGroupComponent> = {
+const meta: Meta<HlmOtpComponent> = {
 	title: 'Input OTP',
-	component: HlmOtpGroupComponent,
+	component: HlmOtpComponent,
 	tags: ['autodocs'],
 	args: {
-		length: 4,
 		pattern: '^[a-zA-Z0-9]$',
 	},
 	argTypes: {
-		length: {
-			control: { type: 'number' },
-		},
 		pattern: {
 			control: { type: 'text' },
 			description: 'A regular expression pattern (as a string) for input validation.',
@@ -32,16 +29,19 @@ export const Default: Story = {
 	render: ({ ...args }) => ({
 		props: args,
 		template: /* HTML */ `
-			<hlm-otp-group ${argsToTemplate(args)}></hlm-otp-group>
+			<hlm-otp ${argsToTemplate(args)}>
+				<hlm-otp-group length="2"></hlm-otp-group>
+				<hlm-otp-group></hlm-otp-group>
+			</hlm-otp>
 		`,
 	}),
 };
 
-export const Pattern: Story = {
+/*export const Pattern: Story = {
 	render: ({ ...args }) => ({
 		props: { ...args, pattern: '\\d+' },
-		template: /* HTML */ `
-			<hlm-otp-group ${argsToTemplate(args)}></hlm-otp-group>
+		template: /!* HTML *!/ `
+			<hlm-otp-group></hlm-otp-group>
 		`,
 	}),
-};
+};*/

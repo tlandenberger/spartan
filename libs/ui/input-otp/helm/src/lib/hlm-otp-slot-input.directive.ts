@@ -6,7 +6,7 @@ import { type VariantProps, cva } from 'class-variance-authority';
 import type { ClassValue } from 'clsx';
 
 export const otpSlotVariants = cva(
-	'flex border-t border-b border-r font-normal items-center justify-center text-center bg-transparent text-base md:text-sm placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-text disabled:opacity-50',
+	'flex border-t border-b border-r font-normal items-center justify-center text-center bg-transparent text-base md:text-sm placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-text',
 	{
 		variants: {
 			size: {

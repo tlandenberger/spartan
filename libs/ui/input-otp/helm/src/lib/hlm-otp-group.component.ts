@@ -1,4 +1,4 @@
-import { Component, computed, input, model, signal } from '@angular/core';
+import { Component, computed, input, model, output, signal } from '@angular/core';
 import { hlm } from '@spartan-ng/brain/core';
 import type { ClassValue } from 'clsx';
 import { HlmOtpSlotComponent } from './hlm-otp-slot.component';
@@ -15,10 +15,11 @@ import { HlmOtpSlotComponent } from './hlm-otp-slot.component';
 				<hlm-otp-slot
 					#otpInput
 					[value]="slot"
-					[active]="_focused() && _activeSlotIndex() === $index"
+					[active]="_focused() && groupActive() && _activeSlotIndex() === $index"
 					[first]="first"
 					[last]="last"
-					[pattern]="_regExp()"
+					[lastInOtp]="last && lastGroup()"
+					[pattern]="regExp()"
 					(valueChange)="updateSlot($event)"
 					(focusNext)="focusNext($index)"
 					(focusPrevious)="focusPrevious($index)"
@@ -35,25 +36,23 @@ export class HlmOtpGroupComponent {
 	protected _computedClass = computed(() => hlm('flex items-center', this.userClass()));
 
 	public readonly length = input<number>(6);
-	public readonly otp = model<string[]>([]);
-	public readonly pattern = input<RegExp | string>(RegExp(/^[a-zA-Z0-9]$/));
+	public readonly values = model<string[]>([]);
+	public readonly regExp = model<RegExp>(RegExp(/^[a-zA-Z0-9]$/));
+	public readonly groupActive = model<boolean>(false);
+	public readonly lastGroup = model<boolean>(false);
+	public readonly focusNextGroup = output<void>();
+	public readonly focusPreviousGroup = output<void>();
 
 	protected readonly _slots = computed<string[]>(() =>
-		Array.from({ length: this.length() }).map((_, index) => this.otp()[index] ?? ''),
+		Array.from({ length: this.length() }).map((_, index) => this.values()[index] ?? ''),
 	);
-	protected readonly _regExp = computed<RegExp>(() => {
-		const pattern = this.pattern();
-		console.log(pattern, typeof pattern);
-		if (typeof pattern === 'string') return RegExp(pattern);
-		return pattern;
-	});
 
 	protected readonly _activeSlotIndex = signal<number>(0);
 	protected readonly _focused = signal<boolean>(true);
 	protected readonly _isFocusChanging = signal<boolean>(false);
 
 	protected updateSlot(value: string) {
-		this.otp.update((acc) => [
+		this.values.update((acc) => [
 			...acc.slice(0, this._activeSlotIndex()),
 			value,
 			...acc.slice(this._activeSlotIndex() + 1),
@@ -63,20 +62,26 @@ export class HlmOtpGroupComponent {
 	protected focusNext(index: number) {
 		this._isFocusChanging.set(true);
 		if (index < this._slots().length - 1) {
-			this._activeSlotIndex.set(index + 1);
+			this._activeSlotIndex.update((acc) => acc + 1);
+		} else {
+			this.focusNextGroup.emit();
 		}
 
-		setTimeout(() => this._isFocusChanging.set(false), 10);
+		requestAnimationFrame(() => this._isFocusChanging.set(false));
 	}
 
 	protected focusPrevious(index: number, removePreviousValue = true) {
-		if (index === 0) return;
-
 		this._isFocusChanging.set(true);
-		this._activeSlotIndex.set(index - 1);
+
+		if (index > 0) {
+			this._activeSlotIndex.update((acc) => acc - 1);
+		} else {
+			this.focusPreviousGroup.emit();
+		}
+
 		if (removePreviousValue) this.updateSlot('');
 
-		setTimeout(() => this._isFocusChanging.set(false), 10);
+		requestAnimationFrame(() => this._isFocusChanging.set(true));
 	}
 
 	protected onFocusOut() {
