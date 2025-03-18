@@ -26,13 +26,44 @@ function replaceSelector(tree: Tree) {
 			return;
 		}
 
-		content = content.replace(/<brn-radio hlm/g, '<hlm-radio');
+		// <brn-radio hlm but between
+		content = replaceBrnRadioHlm(content);
 		content = content.replace(/<\/brn-radio>/g, '</hlm-radio>');
 
 		tree.write(path, content);
 	});
 }
 
+function replaceBrnRadioHlm(input) {
+	// Split input to handle multiple tags separately
+	return input
+		.split(/(?=<)/)
+		.map((tag) => {
+			// Skip if not a brn-radio tag
+			if (!tag.startsWith('<brn-radio')) {
+				return tag;
+			}
+
+			// Remove line breaks, tabs, and other whitespace within the tag
+			// Replace with a single space
+			tag = tag.replace(/\s+/g, ' ');
+
+			// Check if standalone hlm attribute exists
+			const hasHlm = / hlm(?=[\s>])/.test(tag);
+
+			if (hasHlm) {
+				// Remove the hlm attribute and convert to hlm-radio
+				return tag
+					.replace(/<brn-radio/, '<hlm-radio')
+					.replace(/ hlm(?=[\s>])/, '')
+					.replace(/\s+>/g, '>')
+					.replace(/\s+/g, ' ');
+			}
+
+			return tag;
+		})
+		.join('');
+}
 /**
  * Update imports remove BrnRadioComponent import and replace HlmRadioDirective with HlmRadioComponent
  */
