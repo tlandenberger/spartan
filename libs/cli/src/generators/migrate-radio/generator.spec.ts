@@ -67,7 +67,6 @@ describe('migrate-radio generator', () => {
 				import { Component } from '@angular/core';
 				import { BrnRadioComponent } from '@spartan-ng/brain/radio-group';
 				import { HlmRadioDirective, HlmRadioGroupComponent } from '@spartan-ng/ui-radiogroup-helm';
-	
 				@Component({
 					imports: [BrnRadioComponent, HlmRadioDirective, HlmRadioGroupComponent],
 					template: \`
@@ -91,5 +90,43 @@ describe('migrate-radio generator', () => {
 		);
 		expect(content).toContain(`imports: [HlmRadioComponent, HlmRadioGroupComponent],`);
 		expect(content).toContain(`<hlm-radio value="16.1.4">`);
+	});
+	it('should replace BrnRadioComponent also if the hlm is not directly after the brn-radio tag (Standalone)', async () => {
+		tree.write(
+			'app/src/app/app.component.ts',
+			`
+				import { Component } from '@angular/core';
+				import { BrnRadioComponent } from '@spartan-ng/brain/radio-group';
+				import { HlmRadioDirective, HlmRadioGroupComponent } from '@spartan-ng/ui-radiogroup-helm';
+
+				@Component({
+					imports: [BrnRadioComponent, HlmRadioDirective, HlmRadioGroupComponent],
+					template: \`
+						<hlm-radio-group class="font-mono text-sm font-medium" [(ngModel)]="version">
+							<brn-radio
+			hlm
+value="16.1.5">
+								should be replaced 1
+							</brn-radio>
+							<brn-radio class="hlm" value="16.1.4">
+								should not be replaced
+							</brn-radio>
+							<brn-radio class="hlm replace-me" value="hlm" hlm>
+								should be replaced 2
+							</brn-radio>
+
+						</hlm-radio-group>
+					\`
+				})
+				export class AppModule {}
+				`,
+		);
+
+		await migrateRadioGenerator(tree, { skipFormat: true });
+
+		const content = tree.read('app/src/app/app.component.ts', 'utf-8');
+		expect(content).toContain(`<brn-radio class="hlm" value="16.1.4">`);
+		expect(content).toContain(`<hlm-radio class="hlm replace-me" value="hlm">`);
+		expect(content).toContain(`<hlm-radio value="16.1.5">`);
 	});
 });
